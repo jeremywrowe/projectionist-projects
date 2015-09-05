@@ -1,0 +1,183 @@
+{
+  "app/adapters/*.js": {
+    "command": "adapter",
+    "template": [
+      "import ApplicationAdapter from './application';",
+      "",
+      "export default ApplicationAdapter.extend({",
+      "",
+      "});"
+    ],
+    "alternate": "tests/unit/adapters/{}-test.js"
+  },
+
+  "tests/unit/adapters/*-test.js": {
+    "command": "adapterTest",
+    "template": [
+      "import {open} moduleFor, test {close} from 'ember-qunit';",
+      "",
+      "moduleFor('adapter:{}');",
+      "",
+      "test('it adapts', function(assert) {",
+      "  var adapter = this.subject();",
+      "  assert.ok(adapter);",
+      "});"
+    ],
+    "alternate": "app/adapters/{}.js"
+  },
+
+  "app/components/*.js": {
+    "command": "component",
+    "template": [
+      "import Ember from 'ember';",
+      "",
+      "export default Ember.Component.extend({",
+      "",
+      "});"
+    ],
+    "alternate": "tests/integration/components/{}-test.js"
+  },
+
+  "tests/integration/components/*-test.js": {
+    "command": "componentTest",
+    "template": [
+      "import {open} moduleForComponent, test {close} from 'ember-qunit';",
+      "import t from 'htmlbars-inline-precompile';",
+      "",
+      "moduleForComponent('{}', 'component:{}', {",
+      "  integration: true",
+      "});",
+      "",
+      "test('it is a dom building block', function(assert) {",
+      "  this.render(t`{open}{open}{}{close}{close}`);",
+      "  assert.equal(this.$().text().trim(), 'bob the builder');",
+      "});"
+    ],
+    "alternate": "app/components/{}.js"
+  },
+
+  "app/controllers/*.js": {
+    "command": "controller",
+    "template": [
+      "import Ember from 'ember';",
+      "",
+      "export default Ember.Controller.extend({",
+      "",
+      "});"
+    ],
+    "alternate": "tests/unit/controllers/{}-test.js"
+  },
+
+  "tests/unit/controllers/*-test.js": {
+    "command": "controllerTest",
+    "template": [
+      "import {open} moduleFor, test {close} from 'ember-qunit';",
+      "",
+      "moduleFor('controller:{}', {open} {close});",
+      "",
+      "test('it remote controls', function(assert) {",
+      "  var controller = this.subject();",
+      "  assert.ok(controller);",
+      "});"
+    ],
+    "alternate": "app/controllers/{}.js"
+  },
+
+  "app/helpers/*.js": {
+    "command": "helper",
+    "template": [
+      "import Ember from 'ember';",
+      "",
+      "export function {camelcase}(params/*, hash*/) {",
+      "  return params;",
+      "}",
+      "",
+      "export default Ember.Helper.helper({camelcase});"
+    ],
+    "alternate": "tests/unit/helpers/{}-test.js"
+  },
+
+  "tests/unit/helpers/*-test.js": {
+    "command": "helperTest",
+    "template": [
+      "import {open} {camelcase} {close} from '../../../helpers/{}';",
+      "import {open} module, test {close} from 'qunit';",
+      "",
+      "module('helper:{}');",
+      "",
+      "test('aide', function(assert) {",
+      "  let result = {camelcase}();",
+      "  assert.equal(result, 'a winner is you');",
+      "});"
+    ],
+    "alternate": "app/helpers/{}.js"
+  },
+
+  "app/models/*.js": {
+    "command": "model",
+    "template": [
+      "import DS from 'ember-data';",
+      "export default DS.Model.extend({",
+      "",
+      "});"
+    ],
+    "alternate": "tests/unit/models/{}-test.js"
+  },
+
+  "tests/unit/models/*-test.js": {
+    "command": "modelTest",
+    "template": [
+      "import {open} moduleForModel, test {close} from 'ember-qunit';",
+      "",
+      "moduleForModel('{}', 'model:{}');",
+      "",
+      "test('fashion show', function(assert) {",
+      "  let model = this.subject();",
+      "  // let store = this.store();",
+      "  assert.equal(model.get('appleBottomJeans'), 'Boots with the fur');",
+      "});"
+    ],
+    "alternate": "app/models/{}.js"
+  },
+
+  "app/router.js": {
+    "command": "router"
+  },
+
+  "app/routes/*.js": {
+    "command": "route",
+    "template": [
+      "import Ember from 'ember';",
+      "",
+      "export default Ember.Route.extend({",
+      "",
+      "});"
+    ],
+    "alternate": "tests/unit/routes/{}-test.js"
+  },
+
+  "tests/unit/routes/*-test.js": {
+    "command": "routeTest",
+    "template": [
+      "import {open} moduleFor, test {close} from 'ember-qunit';",
+      "",
+      "moduleFor('route:{}');",
+      "",
+      "test('path to success', function(assert) {",
+      "  let route = this.subject();",
+      "  route.send('action', 1);",
+      "  assert.equal(route.get('actionResult'), 1);",
+      "});"
+    ],
+    "alternate": "app/routes/{}.js"
+  },
+
+  "app/templates/*.hbs": {
+    "command": "template",
+    "alternate": "app/components/{}.js"
+  },
+
+  "app/utils/*.js": {
+    "command": "util"
+  }
+}
