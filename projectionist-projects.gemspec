@@ -1,13 +1,15 @@
 # coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'projectionist/projects/version'
+require "projectionist/projects/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "projectionist-projects"
   spec.version       = Projectionist::Projects::VERSION
   spec.authors       = ["Jeremy W. Rowe"]
   spec.email         = ["jeremy.w.rowe@gmail.com"]
+
+  spec.license       = "MIT"
 
   spec.summary       = %q{A quick and dirty script for installing projectionist files in the current directory}
   spec.description   = %q{Projectionist + vim make it easier to jump between alternate files. Configuration of projectionist is mind numbing, I hope to reduce that by adding projectionist project files over time.}
