@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Jeremy W. Rowe"]
   spec.email         = ["jeremy.w.rowe@gmail.com"]
 
-  spec.summary       = %q{Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{Write a longer description or delete this line.}
-  spec.homepage      = "Put your gem's website or public repo URL here."
+  spec.summary       = %q{A quick and dirty script for installing projectionist files in the current directory}
+  spec.description   = %q{Projectionist + vim make it easier to jump between alternate files. Configuration of projectionist is mind numbing, I hope to reduce that by adding projectionist project files over time.}
+  spec.homepage      = "https://github.com/jeremywrowe/projectionist-projects"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
