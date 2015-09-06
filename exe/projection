@@ -32,13 +32,6 @@ if ARGV.count > 0
   parser = OptionParser.new do |opts|
     opts.banner = "Usage: projection [options]"
 
-    opts.on("-l", "--list", "List available projection names") do |list|
-      @names_to_files.each do |name, path|
-        puts name
-      end
-      exit
-    end
-
     opts.on("-p", "--path [name]", "Lists out the paths for the matching name") do |value|
       value ||= ""
       filtered = @names_to_files.select { |name| name.downcase.include? value.downcase }
@@ -49,15 +42,21 @@ if ARGV.count > 0
       exit
     end
 
+    opts.on("-l", "--list", "List available projection names") do |list|
+      @names_to_files.each do |name, path|
+        puts name
+      end
+      exit
+    end
+
     opts.on_tail("-h", "--help") do
       puts opts
       exit
     end
-
-    copy_projection ARGV.first, @names_to_files[ARGV.first]
   end
 
   parser.parse!
+  copy_projection ARGV.first, @names_to_files[ARGV.first]
 else
   choose do |menu|
     menu.prompt = "What type of project? "
