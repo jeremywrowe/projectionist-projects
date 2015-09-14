@@ -117,9 +117,7 @@
     "command": "model",
     "template": [
       "import DS from 'ember-data';",
-      "const { Model, attr } = DS;",
-      "",
-      "export default Model.extend({",
+      "export default DS.Model.extend({",
       "",
       "});"
     ],
@@ -172,6 +170,45 @@
       "});"
     ],
     "alternate": "app/routes/{}.js"
+  },
+
+  "tests/acceptance/*-test.js": {
+    "command": "acceptance",
+    "template": [
+      "import Ember from 'ember';",
+      "import {open} module, test {close} from 'qunit';",
+      "// import startApp from 'app-name/tests/helpers/start-app';",
+      "// import {open} page {close} from 'app-name/tests/pages/page-name';",
+      "",
+      "module('acceptance: {blank}', {",
+      "  beforeEach: function() {",
+      "    this.application = startApp();",
+      "  },",
+      "",
+      "  afterEach: function() {",
+      "    Ember.run(this.application, 'destroy');",
+      "  }",
+      "});",
+      "",
+      "test('visiting /{}', function(assert) {",
+      "  visit('/');",
+      "",
+      "  andThen(function() {",
+      "    assert.equal(currentURL(), '/');",
+      "  });",
+      "});"
+    ]
+  },
+
+  "tests/pages/*.js": {
+    "command": "po",
+    "template": [
+      "import PO from '../page-object';",
+      "",
+      "export const page = PO.build({",
+      "",
+      "});"
+    ]
   },
 
   "app/templates/*.hbs": {
