@@ -7,12 +7,15 @@ require "pathname"
 require "fileutils"
 require "optparse"
 
-include FileUtils
+require_relative "../lib/projectionist/projects"
 
-terminal_width, _  = HighLine::SystemExtensions.terminal_size
-projections_path   = File.expand_path("../../projections", __FILE__)
-available_files    = Dir["#{projections_path}/*.projections.json"]
-@names_to_files    = Hash[available_files.map do |filename|
+include FileUtils
+include Projectionist::Projects
+
+terminal_width, _ = HighLine::SystemExtensions.terminal_size
+projections_path  = File.expand_path("../../projections", __FILE__)
+available_files   = Dir["#{projections_path}/*.projections.json"]
+@names_to_files   = Hash[available_files.map do |filename|
   name = Pathname.new(filename).basename(".projections.json").to_s
   [name, filename]
 end]
