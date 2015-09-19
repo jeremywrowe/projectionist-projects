@@ -52,6 +52,12 @@ if ARGV.count > 0
       exit
     end
 
+    opts.on("-c", "--fetch", "Fetch projections from remote") do |fetch|
+      puts "The following projections are available:"
+      puts fetch_index.keys
+      exit
+    end
+
     opts.on_tail("-h", "--help") do
       puts opts
       exit
