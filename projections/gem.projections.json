@@ -1,0 +1,16 @@
+{
+  "exe/*.rb": {
+    "command": "exe",
+    "alternate": "spec/exe/{}_spec.rb"
+  },
+
+  "lib/*.rb": {
+    "command": "lib",
+    "alternate": "spec/{}_spec.rb"
+  },
+
+  "spec/*_spec.rb": {
+    "command": "spec",
+    "alternate": "lib/{}.rb"
+  }
+}

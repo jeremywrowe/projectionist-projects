@@ -6,69 +6,104 @@ require "highline/import"
 require "pathname"
 require "fileutils"
 require "optparse"
-
-require_relative "../lib/projectionist/projects"
+require "projectionist/projects"
 
 include FileUtils
-include Projectionist::Projects
 
-terminal_width, _ = HighLine::SystemExtensions.terminal_size
-projections_path  = File.expand_path("../../projections", __FILE__)
-available_files   = Dir["#{projections_path}/*.projections.json"]
-@names_to_files   = Hash[available_files.map do |filename|
+include Projectionist::Projects
+extend Projectionist::Projects
+
+AVAILABLE_FILES  = Dir["#{DOWNLOAD_DIRECTORY}/*.projections.json"]
+DOWNLOADED_FILES = Hash[AVAILABLE_FILES.map do |filename|
   name = Pathname.new(filename).basename(".projections.json").to_s
   [name, filename]
 end]
 
+def colorize(string, *colors)
+  colors = Array(colors)
+  HighLine::String.new(string).color(*colors)
+end
+
+def setup_cache_directory
+  unless File.exist? DOWNLOAD_DIRECTORY
+    puts "create projection-projects cache directory (y/N)? #{DOWNLOAD_DIRECTORY}"
+    mkdir_p DOWNLOAD_DIRECTORY if "y" == gets.strip.downcase
+  end
+end
+
 def copy_projection(name, source, destination = "#{getwd}/.projections.json")
-  colored_name = HighLine::String.new(name).color(:red)
   unless source
-    puts "#{colored_name} projection was not found. Use `projection -l` to show available projection files."
+    puts "#{colorize(name, :red)} projection was not found. Use `projection -l` to show available projection files."
     exit -1
   end
 
   cp source, destination
-  puts "Projection #{colored_name} was copied to the current directory."
+  puts "Projection #{colorize(name, :red)} was copied to the current directory."
 end
 
-if ARGV.count > 0
-  parser = OptionParser.new do |opts|
-    opts.banner = "Usage: projection [options]"
-
-    opts.on("-p", "--path [name]", "Lists out the paths for the matching name") do |value|
-      value ||= ""
-      filtered = @names_to_files.select { |name| name.downcase.include? value.downcase }
-      maximum  = filtered.keys.map(&:length).max
-      filtered.each do |name, path|
-        puts "#{HighLine::String.new(name.ljust(maximum)).color(:bold, :blue)} #{HighLine::String.new("=>").color(:cyan)} #{HighLine::String.new(path).color(:green)}"
-      end
-      exit
-    end
-
-    opts.on("-l", "--list", "List available projection names") do |list|
-      @names_to_files.each do |name, path|
-        puts name
-      end
-      exit
-    end
-
-    opts.on("-c", "--fetch", "Fetch projections from remote") do |fetch|
-      puts "The following projections are available:"
-      puts fetch_index.keys
-      exit
-    end
-
-    opts.on_tail("-h", "--help") do
-      puts opts
-      exit
-    end
-  end
-
-  parser.parse!
-  copy_projection ARGV.first, @names_to_files[ARGV.first]
-else
+def run_interactive_shell
   choose do |menu|
     menu.prompt = "What type of project? "
-    menu.choices(*@names_to_files.keys) { |name| copy_projection name, @names_to_files[name] }
+    menu.choices(*DOWNLOADED_FILES.keys) { |name| copy_projection name, DOWNLOADED_FILES[name] }
+  end
+  exit
+end
+
+run_interactive_shell if ARGV.count == 0
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: projection [options]"
+
+  opts.on("-s", "--setup") do
+    setup_cache_directory
+    exit
+  end
+
+  opts.on("-p", "--path [name]", "Lists out the paths for the matching name") do |value|
+    value ||= ""
+    filtered = DOWNLOADED_FILES.select { |name| name.downcase.include? value.downcase }
+    maximum  = filtered.keys.map(&:length).max
+    filtered.each do |name, path|
+      puts [
+        colorize(name.ljust(maximum), :bold, :blue),
+        colorize("=>", :cyan),
+        colorize(path, :red)
+      ].join(" ")
+    end
+    exit
+  end
+
+  opts.on("-l", "--list", "List installed projection names") do |list|
+    DOWNLOADED_FILES.each { |name, path| puts name }
+    exit
+  end
+
+  opts.on("-f", "--fetch", "Fetch projections from remote") do |fetch|
+    puts "The following projections are available:"
+    catch(:server_unavailable) do
+      results  = Projectionist::Projects.fetch_projections
+      projects = results.map { |result| result[:project] }
+      maximum  = results.map(&:length).max
+      projects.each do |project|
+        puts "downloading: #{colorize(project.ljust(maximum), :bold, :blue)}"
+        Projectionist::Projects.download_projection project: project
+      end
+      exit
+    end
+
+    puts "The server is unavailable.. do you haz internets?"
+    exit -1
+  end
+
+  opts.on("-i", "--interactive", "Run in interactive mode") do
+    run_interactive_shell
+  end
+
+  opts.on_tail("-h", "--help") do
+    puts opts
+    exit
   end
 end
+
+parser.parse!
+copy_projection ARGV.first.strip, DOWNLOADED_FILES[ARGV.first.strip]
