@@ -1,6 +1,5 @@
 require "net/http"
 require "csv"
-require "byebug"
 
 require_relative "projects/version"
 
