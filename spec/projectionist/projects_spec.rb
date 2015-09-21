@@ -4,8 +4,8 @@ describe Projectionist::Projects do
   let(:resp) {
     [ 
       %w( project path                               updated ),
-      %w( ember   projections/ember.projections.json 2015-09-20),
-      %w( rails   projections/rails.projections.json 2015-11-20),
+      %w( ember   downloads/ember.projections.json 2015-09-20),
+      %w( rails   downloads/rails.projections.json 2015-11-20),
     ]
       .map { |row| row.join(",") }
       .join("\n")
@@ -13,14 +13,14 @@ describe Projectionist::Projects do
 
   before do
     allow(Net::HTTP).to receive(:get)
-      .with("jeremywrowe.github.io", "/projectionist-projects/index.csv")
+      .with("jeremywrowe.github.io", "/projectionist-projects-files/index.csv")
       .and_return(resp)
   end
 
   let(:results) { 
     [
-      { project: "ember", path: "projections/ember.projections.json", updated: "2015-09-20" },
-      { project: "rails", path: "projections/rails.projections.json", updated: "2015-11-20" }
+      { project: "ember", path: "downloads/ember.projections.json", updated: "2015-09-20" },
+      { project: "rails", path: "downloads/rails.projections.json", updated: "2015-11-20" }
     ]
   }
 
