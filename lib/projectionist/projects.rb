@@ -1,12 +1,16 @@
 require "net/http"
 require "csv"
-
-require_relative "projects/version"
+require "projectionist/projects/version"
 
 module Projectionist
   module Projects
-    INDEX_ROOT         = "jeremywrowe.github.io"
-    DOWNLOAD_DIRECTORY = File.join(ENV["HOME"], ".projection-projects").to_s
+    INDEX_ROOT = "jeremywrowe.github.io"
+
+    if ENV["TEST"]
+      DOWNLOAD_DIRECTORY = File.join(File.expand_path("../../..", __FILE__), "spec", "output")
+    else
+      DOWNLOAD_DIRECTORY = File.join(ENV["HOME"], ".projection-projects")
+    end
 
     def self.fetch_projections
       csv_contents = Net::HTTP.get INDEX_ROOT, "/projectionist-projects-files/index.csv"
@@ -20,13 +24,13 @@ module Projectionist
       normalized_project = "#{project}.projections.json"
       destination_file   = File.join(DOWNLOAD_DIRECTORY, normalized_project)
 
-      if ask_to_overwrite && File.exist? destination_file
+      if ask_to_overwrite && File.exist?(destination_file)
         print "Overwrite existing file? (y/N) "
         return unless stdin.call.strip.downcase == "y"
       end
       
       json_contents = Net::HTTP.get INDEX_ROOT, "/projectionist-projects-files/downloads/#{normalized_project}"
-      File.open('w', destination_file) do |file|
+      File.open(destination_file, "w") do |file|
         file.write json_contents
       end
     rescue Net::HTTP::SocketError
