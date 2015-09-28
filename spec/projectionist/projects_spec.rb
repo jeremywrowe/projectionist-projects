@@ -2,10 +2,10 @@ require "spec_helper"
 
 describe Projectionist::Projects do
   let(:resp) {
-    [ 
-      %w( project path                               updated ),
-      %w( ember   downloads/ember.projections.json 2015-09-20),
-      %w( rails   downloads/rails.projections.json 2015-11-20),
+    [
+      %w( project location                         updated ),
+      %w( ember   downloads/ember.projections.json 20150920),
+      %w( rails   downloads/rails.projections.json 20151120),
     ]
       .map { |row| row.join(",") }
       .join("\n")
@@ -13,30 +13,30 @@ describe Projectionist::Projects do
 
   before do
     allow(Net::HTTP).to receive(:get)
-      .with("jeremywrowe.github.io", "/projectionist-projects-files/index.csv")
+      .with("jeremywrowe.github.io", "/projectionist-projects-files/downloads/index.csv")
       .and_return(resp)
   end
 
-  let(:results) { 
+  let(:results) {
     [
-      { project: "ember", path: "downloads/ember.projections.json", updated: "2015-09-20" },
-      { project: "rails", path: "downloads/rails.projections.json", updated: "2015-11-20" }
+      { project: "ember", location: "downloads/ember.projections.json", updated: "20150920" },
+      { project: "rails", location: "downloads/rails.projections.json", updated: "20151120" }
     ]
   }
 
-  describe "#fetch_projections" do
+  describe "#fetch" do
     it "fetches the available projection configurations from the remote" do
-      expect(described_class.fetch_projections).to match_array results
+      expect(described_class.fetch).to match_array results
     end
 
     it "throws a connection error when the remote is down" do
-      expect(Net::HTTP).to receive(:get) { raise Net::HTTP::SocketError, "the system is down.." }
+      expect(Net::HTTP).to receive(:get) { raise SocketError, "the system is down.." }
 
-      expect { described_class.fetch_projections }.to raise_error { :server_unavailable }
+      expect { described_class.fetch }.to raise_error { :server_unavailable }
     end
   end
 
-  describe "#download_projection", writeable: true do
+  describe "#download", writeable: true do
 
     let(:ember_file) { File.join(described_class::DOWNLOAD_DIRECTORY, "ember.projections.json") }
 
@@ -50,7 +50,7 @@ describe Projectionist::Projects do
       stdin_calls = 0
       stdin       = -> { stdin_calls += 1; "no!" }
 
-      described_class.download_projection(project: :ember, stdin: stdin)
+      described_class.download(project: :ember, stdin: stdin)
 
       expect(stdin_calls).to be_zero
       expect(File.read(ember_file)).to eql("an ember configuration")
@@ -63,7 +63,7 @@ describe Projectionist::Projects do
       File.write(ember_file, "overwrite me")
 
       expect {
-        described_class.download_projection(project: :ember, stdin: stdin)
+        described_class.download(project: :ember, stdin: stdin)
       }.to output(/overwrite existing/i).to_stdout
 
       expect(stdin_calls).to be(1)

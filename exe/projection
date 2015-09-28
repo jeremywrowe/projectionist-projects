@@ -13,8 +13,8 @@ include FileUtils
 include Projectionist::Projects
 extend Projectionist::Projects
 
-AVAILABLE_FILES  = Dir["#{DOWNLOAD_DIRECTORY}/*.projections.json"]
-DOWNLOADED_FILES = Hash[AVAILABLE_FILES.map do |filename|
+AVAILABLE_FILES    = Dir["#{DOWNLOAD_DIRECTORY}/*.projections.json"]
+DOWNLOADED_FILES   = Hash[AVAILABLE_FILES.map do |filename|
   name = Pathname.new(filename).basename(".projections.json").to_s
   [name, filename]
 end]
@@ -74,19 +74,22 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on("-l", "--list", "List installed projection names") do |list|
-    DOWNLOADED_FILES.each { |name, path| puts name }
+    Projectionist::Projects.fetch.each{ |fetched| puts fetched[:project] }
     exit
   end
 
-  opts.on("-f", "--fetch", "Fetch projections from remote") do |fetch|
-    puts "The following projections are available:"
+  opts.on("-d", "--download=DOWNLOADS", "Download projections from remote") do |downloads|
+    downloads = (downloads || "").split(",").map(&:strip)
+
     catch(:server_unavailable) do
-      results  = Projectionist::Projects.fetch_projections
+      results  = Projectionist::Projects.fetch
       projects = results.map { |result| result[:project] }
       maximum  = results.map(&:length).max
-      projects.each do |project|
+      filtered = downloads.any? ? (downloads & projects) : projects
+
+      filtered.each do |project|
         puts "downloading: #{colorize(project.ljust(maximum), :bold, :blue)}"
-        Projectionist::Projects.download_projection project: project
+        Projectionist::Projects.download project: project
       end
       exit
     end

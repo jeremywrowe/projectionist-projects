@@ -12,15 +12,15 @@ module Projectionist
       DOWNLOAD_DIRECTORY = File.join(ENV["HOME"], ".projection-projects")
     end
 
-    def self.fetch_projections
-      csv_contents = Net::HTTP.get INDEX_ROOT, "/projectionist-projects-files/index.csv"
+    def self.fetch
+      csv_contents = Net::HTTP.get INDEX_ROOT, "/projectionist-projects-files/downloads/index.csv"
       CSV.new(csv_contents, headers: true, header_converters: :symbol)
         .map(&:to_hash)
-    rescue Net::HTTP::SocketError
+    rescue SocketError
       throw :server_unavailable
     end
 
-    def self.download_projection(project:, ask_to_overwrite: true, stdin: -> { gets })
+    def self.download(project:, ask_to_overwrite: true, stdin: -> { gets })
       normalized_project = "#{project}.projections.json"
       destination_file   = File.join(DOWNLOAD_DIRECTORY, normalized_project)
 
@@ -33,7 +33,7 @@ module Projectionist
       File.open(destination_file, "w") do |file|
         file.write json_contents
       end
-    rescue Net::HTTP::SocketError
+    rescue SocketError
       throw :server_unavailable
     end
   end
