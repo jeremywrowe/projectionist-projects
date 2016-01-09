@@ -36,7 +36,7 @@ describe Projectionist::Projects do
     end
   end
 
-  describe "#download", writeable: true do
+  describe "#download", writeable: true, setup_download_dir: true do
 
     let(:ember_file) { File.join(described_class::DOWNLOAD_DIRECTORY, "ember.projections.json") }
 

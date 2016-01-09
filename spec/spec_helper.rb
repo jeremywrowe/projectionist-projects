@@ -14,7 +14,17 @@ include FileUtils
 
 RSpec.configure do |config|
   config.before(:each, writeable: true) do
-    rm_rf   Projectionist::Projects::DOWNLOAD_DIRECTORY
+    rm_rf Projectionist::Projects::DOWNLOAD_DIRECTORY if File.exist? Projectionist::Projects::DOWNLOAD_DIRECTORY
+  end
+
+  config.before(:each, setup_download_dir: true) do
     mkdir_p Projectionist::Projects::DOWNLOAD_DIRECTORY
   end
 end
+
+def run_command_with(args)
+  command = File.expand_path("../../exe/projection", __FILE__)
+  args    = args.join(" ")
+  `TEST=true #{command} #{args}`
+end
+

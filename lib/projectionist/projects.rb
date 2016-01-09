@@ -20,11 +20,11 @@ module Projectionist
       throw :server_unavailable
     end
 
-    def self.download(project:, ask_to_overwrite: true, stdin: -> { gets })
+    def self.download(project:, confirm: true, stdin: -> { gets })
       normalized_project = "#{project}.projections.json"
       destination_file   = File.join(DOWNLOAD_DIRECTORY, normalized_project)
 
-      if ask_to_overwrite && File.exist?(destination_file)
+      if confirm && File.exist?(destination_file)
         print "Overwrite existing file? (y/N) "
         return unless stdin.call.strip.downcase == "y"
       end

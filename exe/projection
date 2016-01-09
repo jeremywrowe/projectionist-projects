@@ -26,8 +26,22 @@ end
 
 def setup_cache_directory
   unless File.exist? DOWNLOAD_DIRECTORY
-    puts "create projection-projects cache directory (y/N)? #{DOWNLOAD_DIRECTORY}"
-    mkdir_p DOWNLOAD_DIRECTORY if "y" == gets.strip.downcase
+    mkdir_p DOWNLOAD_DIRECTORY
+  end
+end
+
+def download_files(downloads: [], confirm: true)
+  catch(:server_unavailable) do
+    results  = Projectionist::Projects.fetch
+    projects = results.map { |result| result[:project] }
+    maximum  = results.map(&:length).max
+    filtered = downloads.any? ? (downloads & projects) : projects
+
+    filtered.each do |project|
+      puts "downloading: #{colorize(project.ljust(maximum), :bold, :blue)}"
+      Projectionist::Projects.download project: project, confirm: confirm
+    end
+    return
   end
 end
 
@@ -56,6 +70,7 @@ parser = OptionParser.new do |opts|
 
   opts.on("-s", "--setup") do
     setup_cache_directory
+    download_files confirm: false
     exit
   end
 
@@ -79,21 +94,7 @@ parser = OptionParser.new do |opts|
   end
 
   opts.on("-d", "--download=DOWNLOADS", "Download projections from remote") do |downloads|
-    downloads = (downloads || "").split(",").map(&:strip)
-
-    catch(:server_unavailable) do
-      results  = Projectionist::Projects.fetch
-      projects = results.map { |result| result[:project] }
-      maximum  = results.map(&:length).max
-      filtered = downloads.any? ? (downloads & projects) : projects
-
-      filtered.each do |project|
-        puts "downloading: #{colorize(project.ljust(maximum), :bold, :blue)}"
-        Projectionist::Projects.download project: project
-      end
-      exit
-    end
-
+    download_files downloads: (downloads || "").split(",").map(&:strip)
     puts "The server is unavailable.. do you haz internets?"
     exit -1
   end
